@@ -1,0 +1,167 @@
+# EPS Srbija - Dashboard Card
+# Pre upotrebe: Potrebno je instalirati 'ApexCharts Card' preko HACS-a.
+# Napomena: Ako se vaš senzor ne zove 'sensor.eps_podaci', zamenite ime u kodu ispod.
+
+type: grid
+cards:
+  - type: heading
+    heading: EPS Srbija - Status
+  - type: markdown
+    title: 📊 Статус рачуна
+    content: |-
+      {% set data = state_attr('sensor.eps_podaci', 'status_duga') %}
+      {% set opomene = state_attr('sensor.eps_podaci', 'opomene') %}
+      {% set poruke = state_attr('sensor.eps_podaci', 'poruke') %}
+      {% set saldo = data.balance_amount | float(0) %}
+
+      {% if opomene | count > 0 %}
+        <ha-alert alert-type="error" title="🚨 АКТИВНЕ ОПОМЕНЕ">
+          {% for o in opomene %}- {{ o.text }}<br>{% endfor %}
+        </ha-alert>
+      {% elif saldo > 0 %}
+        <ha-alert alert-type="warning" title="⚠️ Неизмирено задужење!">
+          Дуг: **{{ saldo }} РСД** (Позив: {{ data.commercial_contracts_number }})
+        </ha-alert>
+      {% else %}
+        ### ✅ Сви рачуни плаћени
+      {% endif %}
+
+      {% if poruke | count > 0 and poruke[0].isRead == false %}
+        <hr>
+        <small><b>Последња вест:</b> {{ poruke[0].title }}</small>
+      {% endif %}
+      
+  - type: custom:apexcharts-card
+    header:
+      show: true
+      title: Потрошња електричне енергије (kWh)
+      show_states: true
+      colorize_states: true
+    graph_span: 13mo
+    span:
+      end: month
+    stacked: true
+    series:
+      - entity: sensor.eps_podaci
+        name: Зелена нижа
+        type: column
+        color: rgb(110, 178, 117)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 0 ? model[0].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+      - entity: sensor.eps_podaci
+        name: Зелена виша
+        type: column
+        color: rgb(29, 160, 43)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 1 ? model[1].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+      - entity: sensor.eps_podaci
+        name: Плава нижа
+        type: column
+        color: rgb(99, 148, 204)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 2 ? model[2].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+      - entity: sensor.eps_podaci
+        name: Плава виша
+        type: column
+        color: rgb(66, 114, 165)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 3 ? model[3].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+      - entity: sensor.eps_podaci
+        name: Црвена нижа
+        type: column
+        color: rgb(230, 100, 100)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 4 ? model[4].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+      - entity: sensor.eps_podaci
+        name: Црвена виша
+        type: column
+        color: rgb(180, 40, 40)
+        data_generator: >
+          const model = entity.attributes.potrosnja_kwh.consumptionListForLastTwelveMonthsModel;
+          return model && model.length > 5 ? model[5].monthlyConsumption.map((e) => [new Date(e.year, e.month, 0).getTime(), e.value]) : [];
+    apex_config:
+      xaxis:
+        type: datetime
+        tickPlacement: "on"
+        labels:
+          format: MMM yy
+      yaxis:
+        decimalsInFloat: 0
+      tooltip:
+        shared: true
+
+  - type: custom:apexcharts-card
+    header:
+      show: true
+      title: Месечна задужења (РСД)
+      show_states: true
+      colorize_states: true
+    graph_span: 13mo
+    span:
+      end: month
+    stacked: false
+    series:
+      - entity: sensor.eps_podaci
+        name: Зелена нижа
+        type: line
+        color: rgb(110, 178, 117)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 0 ? model[0].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+      - entity: sensor.eps_podaci
+        name: Зелена виша
+        type: line
+        color: rgb(29, 160, 43)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 1 ? model[1].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+      - entity: sensor.eps_podaci
+        name: Плава нижа
+        type: line
+        color: rgb(99, 148, 204)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 2 ? model[2].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+      - entity: sensor.eps_podaci
+        name: Плава виша
+        type: line
+        color: rgb(66, 114, 165)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 3 ? model[3].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+      - entity: sensor.eps_podaci
+        name: Црвена нижа
+        type: line
+        color: rgb(230, 100, 100)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 4 ? model[4].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+      - entity: sensor.eps_podaci
+        name: Црвена виша
+        type: line
+        color: rgb(180, 40, 40)
+        data_generator: >
+          const model = entity.attributes.potrosnja_rsd.consumptionAmountListForLastTwelveMonthsModel;
+          return model && model.length > 5 ? model[5].monthlyAmounts.map((e) => [new Date(e.year, e.month, 0).getTime(), e.amount]) : [];
+    apex_config:
+      stroke:
+        curve: smooth
+        width: 3
+      markers:
+        size: 0
+        hover:
+          size: 6
+      xaxis:
+        type: datetime
+        tickPlacement: "on"
+        labels:
+          format: MMM yy
+      yaxis:
+        decimalsInFloat: 0
+      tooltip:
+        shared: true
