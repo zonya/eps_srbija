@@ -1,0 +1,11 @@
+{
+  "domain": "eps_srbija",
+  "name": "EPS Srbija",
+  "documentation": "https://github.com/tvoj-username/eps-srbija",
+  "dependencies": [],
+  "codeowners": ["@tvoj-username"],
+  "requirements": ["requests"],
+  "version": "1.0.0",
+  "config_flow": true,
+  "iot_class": "cloud_polling"
+}
