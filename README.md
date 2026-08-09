@@ -25,3 +25,10 @@ Preuzmite YAML kod za karticu iz priloženog fajla `dashboard_card.yaml` i zalep
 
 ## ⚠️ Napomena
 Ovo je nezvanična integracija. Autor nije povezan sa Javnim preduzećem "Elektroprivreda Srbije". Korišćenje integracije je na sopstvenu odgovornost.
+
+## ☕ Podrži
+
+Integracija je besplatna i nastaje u slobodno vreme. Ako ti je uštedela veče,
+možeš da [platiš kafu](https://ko-fi.com/zonya2026).
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/zonya2026)
